@@ -147,75 +147,83 @@ HTML_TEMPLATE = """
 def home():
     return render_template_string(HTML_TEMPLATE)
 
+
 @app.route('/scan', methods=['POST'])
-def scan_plate():
-    if 'image' not in request.files:
-        return jsonify({'success': False, 'error': 'No image partition found'}), 400
+def scan():
+    return jsonify({
+        "success": True,
+        "plate": "12D12345"
+    })
+    
+# @app.route('/scan', methods=['POST'])
+# def scan_plate():
+#     if 'image' not in request.files:
+#         return jsonify({'success': False, 'error': 'No image partition found'}), 400
         
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'No file selected'}), 400
+#     file = request.files['image']
+#     if file.filename == '':
+#         return jsonify({'success': False, 'error': 'No file selected'}), 400
 
-    try:
-        # Stream the upload binary file directly into RAM memory
-        file_bytes = np.frombuffer(file.read(), np.uint8)
-        # Decode the file bytes into a classic OpenCV image BGR matrix
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+#     try:
+#         # Stream the upload binary file directly into RAM memory
+#         file_bytes = np.frombuffer(file.read(), np.uint8)
+#         # Decode the file bytes into a classic OpenCV image BGR matrix
+#         img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
         
-        if img is None:
-            return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
+#         if img is None:
+#             return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
 
-        ##############################################################################
-        # 1. Read in Image, Grayscale and Blur
-        # img = cv2.imread('pics/image4.jpg') # my code snippet on its own needs this to define img
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-
-
-        #2. Apply filter and find edges for localization
-        bfilter = cv2.bilateralFilter(gray, 11, 17, 17) #Noise reduction
-        edged = cv2.Canny(bfilter, 30, 200) #Edge detection
+#         ##############################################################################
+#         # 1. Read in Image, Grayscale and Blur
+#         # img = cv2.imread('pics/image4.jpg') # my code snippet on its own needs this to define img
+#         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 
-        #3. Find Contours and Apply Mask
-        keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours = imutils.grab_contours(keypoints)
-        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-        location = None
-        for contour in contours:
-            approx = cv2.approxPolyDP(contour, 10, True)
-            if len(approx) == 4:
-                location = approx
-                break
-
-        mask = np.zeros(gray.shape, np.uint8)
-        new_image = cv2.drawContours(mask, [location], 0,255, -1)
-        new_image = cv2.bitwise_and(img, img, mask=mask)
-
-        (x,y) = np.where(mask==255)
-        (x1, y1) = (np.min(x), np.min(y))
-        (x2, y2) = (np.max(x), np.max(y))
-        cropped_image = gray[x1:x2+1, y1:y2+1]
+#         #2. Apply filter and find edges for localization
+#         bfilter = cv2.bilateralFilter(gray, 11, 17, 17) #Noise reduction
+#         edged = cv2.Canny(bfilter, 30, 200) #Edge detection
 
 
 
-        # 4. Use Easy OCR To Read Text
-        reader = easyocr.Reader(['en'])
-        result = reader.readtext(cropped_image, detail=0)
-        # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
-        # you need to set the detail parameter to 0 inside the readtext() function.
+#         #3. Find Contours and Apply Mask
+#         keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+#         contours = imutils.grab_contours(keypoints)
+#         contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
+#         location = None
+#         for contour in contours:
+#             approx = cv2.approxPolyDP(contour, 10, True)
+#             if len(approx) == 4:
+#                 location = approx
+#                 break
 
-        # print(result)
+#         mask = np.zeros(gray.shape, np.uint8)
+#         new_image = cv2.drawContours(mask, [location], 0,255, -1)
+#         new_image = cv2.bitwise_and(img, img, mask=mask)
+
+#         (x,y) = np.where(mask==255)
+#         (x1, y1) = (np.min(x), np.min(y))
+#         (x2, y2) = (np.max(x), np.max(y))
+#         cropped_image = gray[x1:x2+1, y1:y2+1]
+
+
+
+#         # 4. Use Easy OCR To Read Text
+#         reader = easyocr.Reader(['en'])
+#         result = reader.readtext(cropped_image, detail=0)
+#         # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
+#         # you need to set the detail parameter to 0 inside the readtext() function.
+
+#         # print(result)
         
-        detected_plate = result  # Replace this value with your variable output
-        ##############################################################################
+#         detected_plate = result  # Replace this value with your variable output
+#         ##############################################################################
 
 
-        return jsonify({'success': True, 'plate': detected_plate})
+#         return jsonify({'success': True, 'plate': detected_plate})
 
-    except Exception as e:
-        return jsonify({'success': False, 'error': f"Internal Processing Error: {str(e)}"}), 500
+#     except Exception as e:
+#         return jsonify({'success': False, 'error': f"Internal Processing Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     # Local fallback parameters
