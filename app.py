@@ -133,7 +133,7 @@ HTML_TEMPLATE = """
                 loading.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.style.borderColor = "#ff3b30";
-                resultDiv.style.innerText = "Server communication failed.";
+                resultDiv.innerText = "Server communication failed.";
             }
         });
     </script>
