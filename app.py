@@ -5,7 +5,7 @@ import os
 import numpy as np
 from flask import Flask, request, jsonify, render_template_string
 import imutils
-# import easyocr
+import easyocr
 
 
 app = Flask(__name__)
