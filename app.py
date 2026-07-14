@@ -150,80 +150,80 @@ def home():
     return render_template_string(HTML_TEMPLATE)
 
 
-# @app.route('/scan', methods=['POST'])
-# def scan():
-#     return jsonify({
-#         "success": True,
-#         "plate": "12D12345"
-#     })
-    
 @app.route('/scan', methods=['POST'])
-def scan_plate():
-    if 'image' not in request.files:
-        return jsonify({'success': False, 'error': 'No image partition found'}), 400
+def scan():
+    return jsonify({
+        "success": True,
+        "plate": "12D12345"
+    })
+    
+# @app.route('/scan', methods=['POST'])
+# def scan_plate():
+#     if 'image' not in request.files:
+#         return jsonify({'success': False, 'error': 'No image partition found'}), 400
         
-    file = request.files['image']
-    print("1. Request received")
+#     file = request.files['image']
+#     print("1. Request received")
 
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'No file selected'}), 400
+#     if file.filename == '':
+#         return jsonify({'success': False, 'error': 'No file selected'}), 400
 
-    try:
-        # Stream the upload binary file directly into RAM memory
-        file_bytes = np.frombuffer(file.read(), np.uint8)
-        print("2. File read")
-        # Decode the file bytes into a classic OpenCV image BGR matrix
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        print("3. Image decoded")
+#     try:
+#         # Stream the upload binary file directly into RAM memory
+#         file_bytes = np.frombuffer(file.read(), np.uint8)
+#         print("2. File read")
+#         # Decode the file bytes into a classic OpenCV image BGR matrix
+#         img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+#         print("3. Image decoded")
         
-        if img is None:
-            return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
+#         if img is None:
+#             return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
 
-        ##############################################################################
-        # Resize large iPhone image
-        target_height = 500
+#         ##############################################################################
+#         # Resize large iPhone image
+#         target_height = 500
 
-        if img.shape[0] > target_height:
-            scale = target_height / img.shape[0]
-            width = int(img.shape[1] * scale)
-            img = cv2.resize(img, (width, target_height))
+#         if img.shape[0] > target_height:
+#             scale = target_height / img.shape[0]
+#             width = int(img.shape[1] * scale)
+#             img = cv2.resize(img, (width, target_height))
 
-        # Convert to grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        print("4. Grayscale")
+#         # Convert to grayscale
+#         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#         print("4. Grayscale")
 
 
-        # Reduce noise
-        gray = cv2.bilateralFilter(gray, 11, 17, 17)
+#         # Reduce noise
+#         gray = cv2.bilateralFilter(gray, 11, 17, 17)
 
-        # Increase contrast
-        gray = cv2.equalizeHist(gray)
+#         # Increase contrast
+#         gray = cv2.equalizeHist(gray)
 
-        # Binary image
-        _, processed = cv2.threshold(
-            gray,
-            0,
-            255,
-            cv2.THRESH_BINARY + cv2.THRESH_OTSU
-        )
+#         # Binary image
+#         _, processed = cv2.threshold(
+#             gray,
+#             0,
+#             255,
+#             cv2.THRESH_BINARY + cv2.THRESH_OTSU
+#         )
 
-        # Use Easy OCR To Read Text
-        # reader = easyocr.Reader(['en']) # moved to top
-        result = reader.readtext(processed, detail=0)
-        print("5. OCR complete")
-        # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
-        # you need to set the detail parameter to 0 inside the readtext() function.
+#         # Use Easy OCR To Read Text
+#         # reader = easyocr.Reader(['en']) # moved to top
+#         result = reader.readtext(processed, detail=0)
+#         print("5. OCR complete")
+#         # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
+#         # you need to set the detail parameter to 0 inside the readtext() function.
 
-        print(result)
+#         print(result)
         
-        detected_plate = result  # Replace this value with your variable output
-        ##############################################################################
+#         detected_plate = result  # Replace this value with your variable output
+#         ##############################################################################
 
 
-        return jsonify({'success': True, 'plate': detected_plate})
+#         return jsonify({'success': True, 'plate': detected_plate})
 
-    except Exception as e:
-        return jsonify({'success': False, 'error': f"Internal Processing Error: {str(e)}"}), 500
+#     except Exception as e:
+#         return jsonify({'success': False, 'error': f"Internal Processing Error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     # Local fallback parameters
