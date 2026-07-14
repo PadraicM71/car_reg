@@ -177,7 +177,7 @@ def scan_plate():
 
         ##############################################################################
         # Resize large iPhone image
-        target_height = 800
+        target_height = 500
 
         if img.shape[0] > target_height:
             scale = target_height / img.shape[0]
