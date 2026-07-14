@@ -5,12 +5,17 @@ import os
 import numpy as np
 from flask import Flask, request, jsonify, render_template_string
 # import imutils
-import easyocr
+from paddleocr import PaddleOCR
 
 
 app = Flask(__name__)
 
-reader = easyocr.Reader(['en']) # moved from below
+ocr = PaddleOCR(
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+    lang="en"
+)
 
 # Enforce a maximum file upload size (e.g., 16 Megabytes) to protect server memory
 # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -166,17 +171,15 @@ def scan():
 
     file = request.files['image']
 
-    # Read image
     image_bytes = np.frombuffer(file.read(), np.uint8)
     img = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
     if img is None:
         return jsonify(success=False, error="Invalid image")
 
-    # Resize for faster OCR
+    # Resize for speed
     h, w = img.shape[:2]
-
-    MAX_WIDTH = 600
+    MAX_WIDTH = 800
 
     if w > MAX_WIDTH:
         scale = MAX_WIDTH / w
@@ -188,31 +191,34 @@ def scan():
             interpolation=cv2.INTER_AREA
         )
 
-    # OCR
-    results = reader.readtext(
-        img,
-        detail=0,
-        paragraph=False,
-        decoder="greedy",
-        allowlist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    )
+    try:
+        result = ocr.predict(img)
 
-    # Combine all OCR text
-    text = "".join(results).upper()
+        plate = ""
 
-    # Keep only letters and numbers
-    plate = "".join(c for c in text if c.isalnum())
+        if result:
+            for page in result:
+                for line in page["rec_texts"]:
+                    plate += line
 
-    if len(plate) >= 5:
+        plate = "".join(c for c in plate.upper() if c.isalnum())
+
+        if len(plate) >= 5:
+            return jsonify(
+                success=True,
+                plate=plate
+            )
+
         return jsonify(
-            success=True,
-            plate=plate
+            success=False,
+            error="No registration found"
         )
 
-    return jsonify(
-        success=False,
-        error="No registration plate found"
-    )
+    except Exception as e:
+        return jsonify(
+            success=False,
+            error=str(e)
+        )
 
 
 if __name__ == '__main__':
