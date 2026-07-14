@@ -162,82 +162,58 @@ def home():
 def scan():
 
     if 'image' not in request.files:
-        return jsonify({
-            "success": False,
-            "error": "No image uploaded"
-        })
+        return jsonify(success=False, error="No image uploaded")
 
     file = request.files['image']
 
-    # Read image into OpenCV
+    # Read image
     image_bytes = np.frombuffer(file.read(), np.uint8)
     img = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
     if img is None:
-        return jsonify({
-            "success": False,
-            "error": "Invalid image"
-        })
+        return jsonify(success=False, error="Invalid image")
 
-    # Resize if image is huge (improves OCR speed)
+    # Resize for faster OCR
     h, w = img.shape[:2]
-    if w > 1600:
-        scale = 1600 / w
-        img = cv2.resize(img, None, fx=scale, fy=scale)
 
-    # Convert to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    MAX_WIDTH = 1000
 
-    # Improve contrast
-    gray = cv2.equalizeHist(gray)
-
-    # Slight blur
-    gray = cv2.GaussianBlur(gray, (5, 5), 0)
-
-    # Adaptive threshold
-    thresh = cv2.adaptiveThreshold(
-        gray,
-        255,
-        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        cv2.THRESH_BINARY,
-        31,
-        15
-    )
+    if w > MAX_WIDTH:
+        scale = MAX_WIDTH / w
+        img = cv2.resize(
+            img,
+            None,
+            fx=scale,
+            fy=scale,
+            interpolation=cv2.INTER_AREA
+        )
 
     # OCR
     results = reader.readtext(
-        thresh,
-        detail=1,
+        img,
+        detail=0,
         paragraph=False,
+        decoder="greedy",
         allowlist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     )
 
-    best_plate = ""
-    best_score = 0
+    # Combine all OCR text
+    text = "".join(results).upper()
 
-    for (_, text, score) in results:
+    # Keep only letters and numbers
+    plate = "".join(c for c in text if c.isalnum())
 
-        # Remove spaces and punctuation
-        plate = "".join(c for c in text.upper() if c.isalnum())
+    if len(plate) >= 5:
+        return jsonify(
+            success=True,
+            plate=plate
+        )
 
-        # Ignore very short strings
-        if len(plate) < 5:
-            continue
+    return jsonify(
+        success=False,
+        error="No registration plate found"
+    )
 
-        if score > best_score:
-            best_score = score
-            best_plate = plate
-
-    if best_plate:
-        return jsonify({
-            "success": True,
-            "plate": best_plate
-        })
-
-    return jsonify({
-        "success": False,
-        "error": "No registration plate detected"
-    })
 
 if __name__ == '__main__':
     # Local fallback parameters
