@@ -174,47 +174,38 @@ def scan_plate():
             return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
 
         ##############################################################################
-        # 1. Read in Image, Grayscale and Blur
-        # img = cv2.imread('pics/image4.jpg') # my code snippet on its own needs this to define img
+        # Resize large iPhone image
+        target_height = 800
+
+        if img.shape[0] > target_height:
+            scale = target_height / img.shape[0]
+            width = int(img.shape[1] * scale)
+            img = cv2.resize(img, (width, target_height))
+
+        # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
+        # Reduce noise
+        gray = cv2.bilateralFilter(gray, 11, 17, 17)
 
+        # Increase contrast
+        gray = cv2.equalizeHist(gray)
 
-        #2. Apply filter and find edges for localization
-        bfilter = cv2.bilateralFilter(gray, 11, 17, 17) #Noise reduction
-        edged = cv2.Canny(bfilter, 30, 200) #Edge detection
+        # Binary image
+        _, processed = cv2.threshold(
+            gray,
+            0,
+            255,
+            cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
 
-
-
-        #3. Find Contours and Apply Mask
-        keypoints = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contours = imutils.grab_contours(keypoints)
-        contours = sorted(contours, key=cv2.contourArea, reverse=True)[:10]
-        location = None
-        for contour in contours:
-            approx = cv2.approxPolyDP(contour, 10, True)
-            if len(approx) == 4:
-                location = approx
-                break
-
-        mask = np.zeros(gray.shape, np.uint8)
-        new_image = cv2.drawContours(mask, [location], 0,255, -1)
-        new_image = cv2.bitwise_and(img, img, mask=mask)
-
-        (x,y) = np.where(mask==255)
-        (x1, y1) = (np.min(x), np.min(y))
-        (x2, y2) = (np.max(x), np.max(y))
-        cropped_image = gray[x1:x2+1, y1:y2+1]
-
-
-
-        # 4. Use Easy OCR To Read Text
-        reader = easyocr.Reader(['en'])
-        result = reader.readtext(cropped_image, detail=0)
+        # Use Easy OCR To Read Text
+        # reader = easyocr.Reader(['en']) # moved to top
+        result = reader.readtext(processed, detail=0)
         # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
         # you need to set the detail parameter to 0 inside the readtext() function.
 
-        # print(result)
+        print(result)
         
         detected_plate = result  # Replace this value with your variable output
         ##############################################################################
