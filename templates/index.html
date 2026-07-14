@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Photo Test</title>
 </head>
@@ -10,27 +11,36 @@
 
 <form action="/upload" method="post" enctype="multipart/form-data">
 
-    <input 
-        type="file" 
-        name="photo"
-        accept="image/*"
-        capture="environment"
-    >
+<input 
+    type="file"
+    name="photo"
+    accept="image/*"
+    capture="environment">
 
-    <br><br>
+<br><br>
 
-    <button type="submit">
-        Upload Photo
-    </button>
+<button type="submit">
+Upload Photo
+</button>
 
 </form>
 
 
 {% if image %}
 
-<h2>Your Photo</h2>
+<h2>Uploaded Image</h2>
 
 <img src="/image" width="300">
+
+
+<h2>Image Details</h2>
+
+<p>Filename: {{ details.filename }}</p>
+<p>File size: {{ details.filesize }} MB</p>
+<p>Width: {{ details.width }} pixels</p>
+<p>Height: {{ details.height }} pixels</p>
+<p>Format: {{ details.format }}</p>
+<p>Colour mode: {{ details.mode }}</p>
 
 {% endif %}
 
