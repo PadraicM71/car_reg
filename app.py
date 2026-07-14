@@ -10,7 +10,7 @@ import easyocr
 
 app = Flask(__name__)
 
-reader = easyocr.Reader(['en'])
+reader = easyocr.Reader(['en']) # moved from below
 
 # Enforce a maximum file upload size (e.g., 16 Megabytes) to protect server memory
 # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -135,7 +135,7 @@ HTML_TEMPLATE = """
                 loading.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.style.borderColor = "#ff3b30";
-                resultDiv.innerText = "Server communication failed.";
+                resultDiv.style.innerText = "Server communication failed.";
             }
         });
     </script>
@@ -156,74 +156,88 @@ def home():
 #         "success": True,
 #         "plate": "12D12345"
 #     })
-    
+
+
 @app.route('/scan', methods=['POST'])
-def scan_plate():
+def scan():
+
     if 'image' not in request.files:
-        return jsonify({'success': False, 'error': 'No image partition found'}), 400
-        
+        return jsonify({
+            "success": False,
+            "error": "No image uploaded"
+        })
+
     file = request.files['image']
-    print("1. Request received")
 
-    if file.filename == '':
-        return jsonify({'success': False, 'error': 'No file selected'}), 400
+    # Read image into OpenCV
+    image_bytes = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
 
-    try:
-        # Stream the upload binary file directly into RAM memory
-        file_bytes = np.frombuffer(file.read(), np.uint8)
-        print("2. File read")
-        # Decode the file bytes into a classic OpenCV image BGR matrix
-        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        print("3. Image decoded")
-        
-        if img is None:
-            return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
+    if img is None:
+        return jsonify({
+            "success": False,
+            "error": "Invalid image"
+        })
 
-        ##############################################################################
-        # Resize large iPhone image
-        target_height = 500
+    # Resize if image is huge (improves OCR speed)
+    h, w = img.shape[:2]
+    if w > 1600:
+        scale = 1600 / w
+        img = cv2.resize(img, None, fx=scale, fy=scale)
 
-        if img.shape[0] > target_height:
-            scale = target_height / img.shape[0]
-            width = int(img.shape[1] * scale)
-            img = cv2.resize(img, (width, target_height))
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Convert to grayscale
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        print("4. Grayscale")
+    # Improve contrast
+    gray = cv2.equalizeHist(gray)
 
+    # Slight blur
+    gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        # Reduce noise
-        gray = cv2.bilateralFilter(gray, 11, 17, 17)
+    # Adaptive threshold
+    thresh = cv2.adaptiveThreshold(
+        gray,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        31,
+        15
+    )
 
-        # Increase contrast
-        gray = cv2.equalizeHist(gray)
+    # OCR
+    results = reader.readtext(
+        thresh,
+        detail=1,
+        paragraph=False,
+        allowlist="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    )
 
-        # Binary image
-        _, processed = cv2.threshold(
-            gray,
-            0,
-            255,
-            cv2.THRESH_BINARY + cv2.THRESH_OTSU
-        )
+    best_plate = ""
+    best_score = 0
 
-        # Use Easy OCR To Read Text
-        # reader = easyocr.Reader(['en']) # moved to top
-        result = reader.readtext(processed, detail=0)
-        print("5. OCR complete")
-        # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
-        # you need to set the detail parameter to 0 inside the readtext() function.
+    for (_, text, score) in results:
 
-        print(result)
-        
-        detected_plate = result  # Replace this value with your variable output
-        ##############################################################################
+        # Remove spaces and punctuation
+        plate = "".join(c for c in text.upper() if c.isalnum())
 
+        # Ignore very short strings
+        if len(plate) < 5:
+            continue
 
-        return jsonify({'success': True, 'plate': detected_plate})
+        if score > best_score:
+            best_score = score
+            best_plate = plate
 
-    except Exception as e:
-        return jsonify({'success': False, 'error': f"Internal Processing Error: {str(e)}"}), 500
+    if best_plate:
+        return jsonify({
+            "success": True,
+            "plate": best_plate
+        })
+
+    return jsonify({
+        "success": False,
+        "error": "No registration plate detected"
+    })
 
 if __name__ == '__main__':
     # Local fallback parameters
