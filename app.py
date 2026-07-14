@@ -176,7 +176,7 @@ def scan():
     # Resize for faster OCR
     h, w = img.shape[:2]
 
-    MAX_WIDTH = 1000
+    MAX_WIDTH = 600
 
     if w > MAX_WIDTH:
         scale = MAX_WIDTH / w
