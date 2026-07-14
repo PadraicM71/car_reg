@@ -10,6 +10,8 @@ import easyocr
 
 app = Flask(__name__)
 
+reader = easyocr.Reader(['en'])
+
 # Enforce a maximum file upload size (e.g., 16 Megabytes) to protect server memory
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
