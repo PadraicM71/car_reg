@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Photo Test</title>
+</head>
 
+<body>
+
+<h2>Take a Photo</h2>
+
+<form action="/upload" method="post" enctype="multipart/form-data">
+
+    <input 
+        type="file" 
+        name="photo"
+        accept="image/*"
+        capture="environment"
+    >
+
+    <br><br>
+
+    <button type="submit">
+        Upload Photo
+    </button>
+
+</form>
+
+
+{% if image %}
+
+<h2>Your Photo</h2>
+
+<img src="/image" width="300">
+
+{% endif %}
+
+
+</body>
+</html>
