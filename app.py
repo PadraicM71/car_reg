@@ -163,14 +163,18 @@ def scan_plate():
         return jsonify({'success': False, 'error': 'No image partition found'}), 400
         
     file = request.files['image']
+    print("1. Request received")
+
     if file.filename == '':
         return jsonify({'success': False, 'error': 'No file selected'}), 400
 
     try:
         # Stream the upload binary file directly into RAM memory
         file_bytes = np.frombuffer(file.read(), np.uint8)
+        print("2. File read")
         # Decode the file bytes into a classic OpenCV image BGR matrix
         img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        print("3. Image decoded")
         
         if img is None:
             return jsonify({'success': False, 'error': 'Corrupt or unsupported image format'}), 400
@@ -186,6 +190,8 @@ def scan_plate():
 
         # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        print("4. Grayscale")
+
 
         # Reduce noise
         gray = cv2.bilateralFilter(gray, 11, 17, 17)
@@ -204,6 +210,7 @@ def scan_plate():
         # Use Easy OCR To Read Text
         # reader = easyocr.Reader(['en']) # moved to top
         result = reader.readtext(processed, detail=0)
+        print("5. OCR complete")
         # To get EasyOCR to return only the detected text without the bounding box coordinates and confidence scores, 
         # you need to set the detail parameter to 0 inside the readtext() function.
 
