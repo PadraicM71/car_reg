@@ -2,57 +2,99 @@
 <html>
 
 <head>
-    <title>Photo Test</title>
+    <title>AI Reg Scan</title>
 </head>
 
 <body>
 
-<h2>Take a Photo</h2>
-<h4>(Best Performance with Chrome)</h4>
+<h2>Padraic's AI Vehicle Information App</h2>
+<h4>(Chrome Browser is Prefered)</h4>
 
-<form action="/upload" method="post" enctype="multipart/form-data">
+<form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
 
-<input 
-    type="file"
-    name="photo"
-    accept="image/*"
-    capture="environment">
+    <input
+        type="file"
+        id="photo"
+        name="photo"
+        accept="image/*"
+        capture="environment"
+        style="display:none;">
+
+    <label for="photo" style="
+        display:inline-block;
+        padding:10px 20px;
+        border:1px solid #000;
+        border-radius:5px;
+        cursor:pointer;
+        background:#f0f0f0;
+    ">
+        📷 Take Photo
+    </label>
 
     <input type="hidden" name="latitude" id="latitude">
     <input type="hidden" name="longitude" id="longitude">
 
-<br><br>
-
-<button type="submit">
-Upload Photo
-</button>
-
 </form>
 
 
+
 {% if image %}
-
 <h2>Uploaded Image</h2>
-
 <img src="/image" width="300">
 
+<br>
 
-<h2>Image Details</h2>
+<button type="button" id="detailsBtn" onclick="toggleDetails()">
+    Show Image Details
+</button>
 
-<p>Filename: {{ details.filename }}</p>
-<p>File size: {{ details.filesize }} MB</p>
-<p>Width: {{ details.width }} pixels</p>
-<p>Height: {{ details.height }} pixels</p>
-<p>Format: {{ details.format }}</p>
-<p>Colour mode: {{ details.mode }}</p>
-<p>Latitude: {{ details.latitude }}</p>
-<p>Longitude: {{ details.longitude }}</p>
+<div id="imageDetails" style="display:none;">
+
+    <h3>Image Details:</h3>
+
+    <p>Filename: {{ details.filename }}</p>
+    <p>File size: {{ details.filesize }} MB</p>
+    <p>Width: {{ details.width }} pixels</p>
+    <p>Height: {{ details.height }} pixels</p>
+    <p>Format: {{ details.format }}</p>
+    <p>Colour mode: {{ details.mode }}</p>
+    <p>Latitude: {{ details.latitude }}</p>
+    <p>Longitude: {{ details.longitude }}</p>
+    <p>OCR: {{ details.ocr }}</p>
+
+</div>
+
 <p>OCR: {{ details.ocr }}</p>
 
 {% endif %}
 
-
 <script>
+
+// Take photo and upload
+document.getElementById("photo").addEventListener("change", function () {
+if (this.files.length === 0)
+    return;
+document.getElementById("uploadForm").submit();
+});
+
+
+// Show/Hide Image Details
+function toggleDetails() {
+
+    const details = document.getElementById("imageDetails");
+    const button = document.getElementById("detailsBtn");
+
+    if (details.style.display === "none") {
+        details.style.display = "block";
+        button.textContent = "Hide Image Details";
+    } else {
+        details.style.display = "none";
+        button.textContent = "Show Image Details";
+    }
+}
+
+
+// Get Geo Location Information
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
         function(position) {
@@ -64,8 +106,8 @@ if (navigator.geolocation) {
         }
     );
 }
-</script>
 
+</script>
 
 </body>
 </html>
