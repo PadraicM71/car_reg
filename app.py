@@ -33,20 +33,20 @@ def upload():
     filepath = os.path.join(UPLOAD_FOLDER, "latest.jpg")
     photo.save(filepath)
 
-    # Get file details
-    # file_size_bytes = os.path.getsize(filepath)
-    # file_size_mb = round(file_size_bytes / (1024 * 1024), 2)
 
     # Open image and inspect
     img = Image.open(filepath)
 
     # Resize so the longest side is 1500 pixels
-    img.thumbnail((1500, 1500))
+    # img.thumbnail((1500, 1500)) # this work fine - but lets try 800
+    # 1000 worked well - going to 800 the reg was still perfect but the other insignificant text
+    # in an image started to suffer - which is fine.
+    img.thumbnail((800, 800)) # 
     img.save(filepath)
 
+    # Get file details
     file_size_bytes = os.path.getsize(filepath)
     file_size_mb = round(file_size_bytes / (1024 * 1024), 2)
-
     image_details["filename"] = photo.filename
     image_details["filesize"] = file_size_mb
     image_details["width"] = img.width
@@ -88,6 +88,7 @@ def image():
         "uploads/latest.jpg",
         mimetype="image/jpeg"
     )
+
 
 
 
