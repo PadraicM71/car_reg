@@ -66,15 +66,32 @@ def upload():
     # do OCR experimenting here and just return the result in 'image_details' for now
     # late you will make this a function on its own and a specific interface in index.html
     result = ocr.predict(filepath)
-    # image_details["ocr"] = result
     print(type(result))
     ocr_found = []
     for line in result:
         for text in line["rec_texts"]:
             print(text)
             ocr_found.append(text)
-
     image_details["ocr"]=ocr_found
+
+
+
+
+
+
+
+
+    # Debugging (not required - just information to generate on Render runs):
+    print('filename:', photo.filename)
+    print('Long OCR Result from Paddle:', result)
+    print('file size:', file_size_mb)
+    print('image width:', img.width)
+    print('image height:', img.height)
+    print('image format:', img.format)
+    print('color mode:', img.mode)
+    print('latitude:', latitude)
+    print('longitude:', longitude)
+    print('all ocr found by line (list format):', ocr_found)
 
 
     # *********** FIN OCR Skunk Works *************
@@ -93,6 +110,7 @@ def image():
         "uploads/latest.jpg",
         mimetype="image/jpeg"
     )
+
 
 
 
