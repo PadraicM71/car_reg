@@ -62,10 +62,12 @@ def upload():
     result = ocr.predict(filepath)
     # image_details["ocr"] = result
     print(type(result))
+    ocr_found = []
     for line in result:
         for text in line["rec_texts"]:
             print(text)
-            image_details["ocr"]=text
+            ocr_found.append(text)
+            image_details["ocr"]=ocr_found
 
 
 
