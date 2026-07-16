@@ -1,125 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Padraic's AI Reg Scan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padraic's AI Reg App</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+
+        /* ---------- Take Photo Button ---------- */
+
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .button {
+            display: inline-block;
+            width: 60%;
+            padding: 14px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: #1976d2;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background: #1565c0;
+        }
+
+        /* ---------- Metadata ---------- */
+
+        .small-button {
+            display: block;
+            margin: 15px auto;
+            padding: 8px 18px;
+            font-size: 14px;
+            border: 1px solid #999;
+            border-radius: 6px;
+            background: #efefef;
+            cursor: pointer;
+        }
+
+        .metadata {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .metadata p {
+            text-align: left;
+            margin: 4px 0;
+        }
+
+        /* ---------- Registration Buttons ---------- */
+
+        .reg-button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #1976d2;
+            background: white;
+            cursor: pointer;
+        }
+
+        .reg-button:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 25px;
+            color: #666;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<h2>Padraic's Vehicle Information AI App</h2>
-<h4>(Chrome Browser is Prefered)</h4>
+<div class="container">
 
-<form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+    <h1>🚗 Vehicle Registration Scanner</h1>
 
-    <input
-        type="file"
-        id="photo"
-        name="photo"
-        accept="image/*"
-        capture="environment"
-        style="display:none;">
+    <p>
+        Take a photo of an Irish registration plate to identify the vehicle.
+    </p>
 
-    <label for="photo" style="
-        display:inline-block;
-        padding:10px 20px;
-        border:1px solid #000;
-        border-radius:5px;
-        cursor:pointer;
-        background:#f0f0f0;
-    ">
-        📷 Take Photo
-    </label>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
 
-    <input type="hidden" name="latitude" id="latitude">
-    <input type="hidden" name="longitude" id="longitude">
+        <input
+            type="file"
+            id="photo"
+            name="photo"
+            accept="image/*"
+            capture="environment"
+            style="display:none;">
 
-</form>
+        <div class="button-container">
+            <label for="photo" class="button">
+                📷 Take Photo
+            </label>
+        </div>
 
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
 
+    </form>
 
-{% if image %}
-<h2>Uploaded Image</h2>
-<img src="/image" width="300">
+    {% if image %}
 
-<br>
+    <h2>Uploaded Image</h2>
 
-<button type="button" id="detailsBtn" onclick="toggleDetails()">
-    Show Image Details
-</button>
+    <img src="/image">
 
-<div id="imageDetails" style="display:none;">
+    <button
+        class="small-button"
+        type="button"
+        id="detailsBtn"
+        onclick="toggleDetails()">
 
-    <h3>Image Details:</h3>
+        Image Metadata
 
-    <p>Filename: {{ details.filename }}</p>
-    <p>File size: {{ details.filesize }} MB</p>
-    <p>Width: {{ details.width }} pixels</p>
-    <p>Height: {{ details.height }} pixels</p>
-    <p>Format: {{ details.format }}</p>
-    <p>Colour mode: {{ details.mode }}</p>
-    <p>Latitude: {{ details.latitude }}</p>
-    <p>Longitude: {{ details.longitude }}</p>
-    <p>OCR raw: {{ details.ocr }}</p>
+    </button>
+
+    <div class="metadata" id="imageDetails">
+
+        <p><strong>Filename:</strong> {{ details.filename }}</p>
+        <p><strong>File size:</strong> {{ details.filesize }} MB</p>
+        <p><strong>Width:</strong> {{ details.width }} px</p>
+        <p><strong>Height:</strong> {{ details.height }} px</p>
+        <p><strong>Format:</strong> {{ details.format }}</p>
+        <p><strong>Mode:</strong> {{ details.mode }}</p>
+        <p><strong>Latitude:</strong> {{ details.latitude }}</p>
+        <p><strong>Longitude:</strong> {{ details.longitude }}</p>
+        <p><strong>OCR:</strong> {{ details.ocr }}</p>
+
+    </div>
+
+    <h2>Detected Registrations</h2>
+
+    {% if details.valid_regs %}
+
+        {% for reg in details.valid_regs %}
+
+        <form action="/reg" method="get">
+
+            <input
+                type="hidden"
+                name="reg"
+                value="{{ reg }}">
+
+            <button class="reg-button" type="submit">
+                {{ reg }}
+            </button>
+
+        </form>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p><em>No registration plates detected.</em></p>
+
+    {% endif %}
+
+    {% endif %}
+
+    <footer>
+        &copy; Padraic Moran<br>
+        Optimised for Google Chrome
+    </footer>
 
 </div>
 
-<!-- <p>Valid Registration: {{ details.valid_regs }}</p> this area will show final reg plate data when processed -->
-<h3>Possible Registrations</h3>
-
-{% for reg in details.valid_regs %}
-
-<form action="/reg" method="get" style="display:inline;">
-    <input type="hidden" name="reg" value="{{ reg }}">
-    <button type="submit">{{ reg }}</button>
-</form>
-
-{% endfor %}
-
-
-
-
-
-
-{% endif %}
-
 <script>
 
-// Take photo and upload
+// Automatically upload when a photo is selected
 document.getElementById("photo").addEventListener("change", function () {
-if (this.files.length === 0)
-    return;
-document.getElementById("uploadForm").submit();
+
+    if (this.files.length === 0)
+        return;
+
+    document.getElementById("uploadForm").submit();
+
 });
 
-
-// Show/Hide Image Details
+// Show / Hide Metadata
 function toggleDetails() {
 
     const details = document.getElementById("imageDetails");
     const button = document.getElementById("detailsBtn");
 
-    if (details.style.display === "none") {
-        details.style.display = "block";
-        button.textContent = "Hide Image Details";
-    } else {
+    if (details.style.display === "block") {
+
         details.style.display = "none";
-        button.textContent = "Show Image Details";
+        button.textContent = "Image Metadata";
+
+    } else {
+
+        details.style.display = "block";
+        button.textContent = "Hide Metadata";
+
     }
+
 }
 
-
-// Get Geo Location Information
+// Get device location
 if (navigator.geolocation) {
+
     navigator.geolocation.getCurrentPosition(
+
         function(position) {
-            document.getElementById("latitude").value = position.coords.latitude;
-            document.getElementById("longitude").value = position.coords.longitude;
+
+            document.getElementById("latitude").value =
+                position.coords.latitude;
+
+            document.getElementById("longitude").value =
+                position.coords.longitude;
+
         },
+
         function(error) {
+
             console.log("Location error:", error.message);
+
         }
+
     );
+
 }
 
 </script>
