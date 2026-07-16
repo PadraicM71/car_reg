@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, send_file
 from PIL import Image
 import os
-
+import re
 from paddleocr import PaddleOCR
 
 ocr = PaddleOCR(
@@ -18,6 +18,32 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 image_details = {}
+
+
+
+
+# helper functions:
+def extract_and_strip_irish_plates(ocr_results):
+    county_codes = (
+        r"(?:C|CE|CN|CW|D|DL|G|KE|KK|KY|L|LD|LH|LK|LM|LS|MH|MN|MO|MS|OY|RN|SO|T|TN|TS|W|WD|WH|WX|WW)"
+    )
+    
+    # Matches plates with or without spaces/hyphens
+    flexible_pattern = rf"^\d{{2,3}}[-\s]*{county_codes}[-\s]*\d{{1,6}}$"
+    
+    valid_stripped_plates = []
+    
+    for plate in ocr_results:
+        cleaned_plate = str(plate).strip().upper()
+        
+        if re.match(flexible_pattern, cleaned_plate):
+            # Remove all hyphens and spaces from the valid plate
+            stripped = re.sub(r'[- \s]', '', cleaned_plate)
+            valid_stripped_plates.append(stripped)
+            
+    return valid_stripped_plates
+
+
 
 
 
@@ -62,7 +88,7 @@ def upload():
     image_details["longitude"] = longitude
 
 
-    # *********** START OCR Skunk Works ***********
+    # *********** START OCR for function creation ***********
     # do OCR experimenting here and just return the result in 'image_details' for now
     # late you will make this a function on its own and a specific interface in index.html
     result = ocr.predict(filepath)
@@ -74,11 +100,7 @@ def upload():
             ocr_found.append(text)
     image_details["ocr"]=ocr_found
 
-
-
-
-
-
+    image_details["valid_regs"]=extract_and_strip_irish_plates(ocr_found)
 
     # Debugging (not required - just information to generate on Render runs):
     print('filename:', photo.filename)
@@ -93,7 +115,12 @@ def upload():
     print('all ocr found by line (list format):', ocr_found)
 
 
-    # *********** FIN OCR Skunk Works *************
+    # *********** FIN OCR for function creation *************
+
+
+
+
+
     
     return render_template(
         "index.html",
@@ -109,6 +136,7 @@ def image():
         "uploads/latest.jpg",
         mimetype="image/jpeg"
     )
+
 
 
 
