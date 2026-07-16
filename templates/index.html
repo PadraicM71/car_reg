@@ -98,19 +98,41 @@
         /* ---------- Registration Buttons ---------- */
 
         .reg-button {
+            display: block;
             width: 100%;
-            padding: 14px;
-            margin-top: 10px;
-            font-size: 18px;
-            border-radius: 8px;
-            border: 1px solid #1976d2;
-            background: white;
+            padding: 16px;
+            margin-top: 12px;
+
+            font-size: 20px;
+            font-weight: bold;
+
+            background: #1976d2;
+            color: #ffffff;
+
+            border: none;
+            border-radius: 10px;
+
             cursor: pointer;
+
+            -webkit-appearance: none;
+            appearance: none;
+
+            text-align: center;
         }
 
         .reg-button:hover {
-            background: #1976d2;
-            color: white;
+            background: #1565c0;
+            color: #ffffff;
+        }
+
+        .reg-button:active {
+            background: #0d47a1;
+            color: #ffffff;
+        }
+
+        .reg-button:focus {
+            outline: none;
+            color: #ffffff;
         }
 
         footer {
