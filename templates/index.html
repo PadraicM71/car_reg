@@ -178,9 +178,21 @@
             100%{transform:rotate(360deg);}
         }
 
+       /* Base styles for desktop screens */
         footer strong {
-            font-weight: 1100;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-style: italic;
+            font-weight: 700;
+            font-size: 1.25rem; 
         }
+
+        /* Responsive styles for mobile screens */
+        @media (max-width: 768px) {
+            footer strong {
+                font-size: 1.5rem; 
+            }
+        }
+
 
     </style>
 
@@ -270,7 +282,7 @@
 
     {% else %}
 
-        <p><em>No registration plates detected.</em></p>
+        <p><em>No registration plates detected</em></p>
 
     {% endif %}
 
@@ -350,7 +362,7 @@ if (navigator.geolocation) {
 <div id="loading" style="display:none;">
     <div class="loader-box">
         <div class="spinner"></div>
-        <p>🚗 AI Analysis of Image...</p>
+        <p>🚙 AI Analysis of Image...</p>
         <p>Please wait...</p><br>
         <p>Scanning registration plate data...</p>
         
