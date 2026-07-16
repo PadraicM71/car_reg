@@ -53,6 +53,20 @@ def index():
 
 
 
+
+@app.route("/reg")
+def reg():
+
+    reg = request.args.get("reg")
+
+    return render_template(
+        "reg.html",
+        reg=reg
+    )
+
+
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     photo = request.files["photo"]
@@ -100,7 +114,9 @@ def upload():
             ocr_found.append(text)
     image_details["ocr"]=ocr_found
 
-    image_details["valid_regs"]=extract_and_strip_irish_plates(ocr_found)
+    irish_reg_plates = extract_and_strip_irish_plates(ocr_found)
+
+    image_details["valid_regs"]=irish_reg_plates
 
     # Debugging (not required - just information to generate on Render runs):
     print('filename:', photo.filename)
