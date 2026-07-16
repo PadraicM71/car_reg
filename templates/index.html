@@ -2,12 +2,12 @@
 <html>
 
 <head>
-    <title>AI Reg Scan</title>
+    <title>Padraic's AI Reg Scan</title>
 </head>
 
 <body>
 
-<h2>Padraic's AI Vehicle Information App</h2>
+<h2>Padraic's Vehicle Information AI App</h2>
 <h4>(Chrome Browser is Prefered)</h4>
 
 <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
@@ -64,7 +64,22 @@
 
 </div>
 
-<p>Valid Registration: {{ details.valid_regs }}</p> <!-- this area will show final reg plate data when processed -->
+<!-- <p>Valid Registration: {{ details.valid_regs }}</p> this area will show final reg plate data when processed -->
+<h3>Possible Registrations</h3>
+
+{% for reg in details.valid_regs %}
+
+<form action="/reg" method="get" style="display:inline;">
+    <input type="hidden" name="reg" value="{{ reg }}">
+    <button type="submit">{{ reg }}</button>
+</form>
+
+{% endfor %}
+
+
+
+
+
 
 {% endif %}
 
