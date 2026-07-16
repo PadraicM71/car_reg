@@ -80,7 +80,6 @@ def upload():
 
 
 
-
     # Debugging (not required - just information to generate on Render runs):
     print('filename:', photo.filename)
     print('Long OCR Result from Paddle:', result)
