@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, send_file
-from PIL import Image
+from PIL import Image, ImageOps
 import os
 import re
 from paddleocr import PaddleOCR
@@ -74,8 +74,12 @@ def upload():
     photo.save(filepath)
 
 
-    # Open image and inspect
+    # Open image
     img = Image.open(filepath)
+    # Apply the EXIF orientation - keeps taken pic orientation
+    img = ImageOps.exif_transpose(img)
+    # Save the corrected orientated image
+    img.save(filepath)
 
     # Resize so the longest side is 1500 pixels
     # img.thumbnail((1500, 1500)) # this work fine - but lets try 800
