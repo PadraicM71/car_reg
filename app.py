@@ -117,8 +117,9 @@ def upload():
             print(text)
             ocr_found.append(text)
     image_details["ocr"]=ocr_found
-
-    irish_reg_plates = extract_and_strip_irish_plates(ocr_found)
+    # need to convert all 'I' to a 1 as confusion between I and 1 can happen on some reg plates
+    updated_list_I_conversion = [text.replace('I', '1') for text in ocr_found]
+    irish_reg_plates = extract_and_strip_irish_plates(updated_list_I_conversion)
 
     image_details["valid_regs"]=irish_reg_plates
 
