@@ -23,7 +23,7 @@ def vehicle_reg(registration):
 
         # if Playwright cant find a label etc., its default timeout is 30 seconds
         # this default value is changed to 1 second below
-        page.set_default_timeout(1000)
+        page.set_default_timeout(10000)
 
         # 2. Handle the Cookie Popup - Add a Cookie Clicker!
         # This looks for a button containing the word "Accept"
