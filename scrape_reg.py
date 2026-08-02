@@ -19,11 +19,20 @@ def vehicle_reg(registration):
         browser = p.chromium.launch(headless=True) # NEEDED FOR RENDER
         page = browser.new_page()
         
+
+        print('DEBUG 1')
+
         page.goto("https://www.vehicleservices.gov.ie/cmv")
+
+        print('DEBUG 2')
+
 
         # if Playwright cant find a label etc., its default timeout is 30 seconds
         # this default value is changed to 1 second below
-        page.set_default_timeout(100000)
+        page.set_default_timeout(20000)
+
+        print('DEBUG 3')
+
 
         # 2. Handle the Cookie Popup - Add a Cookie Clicker!
         # This looks for a button containing the word "Accept"
