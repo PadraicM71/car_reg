@@ -39,7 +39,9 @@ def vehicle_reg(registration):
         try:
             # Use a specific selector or search for the text on the button
             accept_button = page.get_by_role("button", name="Use Only Essential Cookies")
-        
+
+            print('DEBUG 4')
+            
             # Check if it's visible before clicking to avoid errors if it doesn't show
             # Wait for it! Some banners take a second to slide in. Using is_visible(timeout=5000) gives 
             # it a 5-second window to appear - changed this timing here as it appears quickly.
@@ -49,7 +51,8 @@ def vehicle_reg(registration):
         except Exception:
             print("No cookie popup appeared...")
 
-
+        print('DEBUG 5')
+        
         # 3: Fill the field
         # Playwright waits for the JavaScript to load the element automatically
         # page.fill("#regNumber", "04lh262") # this one has no tax - for testing
