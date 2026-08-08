@@ -3,6 +3,7 @@ from PIL import Image, ImageOps
 import os
 import re
 from paddleocr import PaddleOCR
+from server_reg import get_details
 
 ocr = PaddleOCR(
     lang="en",
@@ -57,11 +58,13 @@ def index():
 @app.route("/reg")
 def reg():
 
-    reg = request.args.get("reg")
+    registration = request.args.get("reg")
+
+    vehicle = get_details(registration)
 
     return render_template(
         "reg.html",
-        reg=reg
+        vehicle=vehicle
     )
 
 
@@ -76,7 +79,7 @@ def upload():
 
     # Open image
     img = Image.open(filepath)
-    # Apply the EXIF orientation - keeps taken pic orientation
+    # Apply the EXIF orientation - keeps taken pic orientation; need to import ImageOps too for this
     img = ImageOps.exif_transpose(img)
     # Save the corrected orientated image
     img.save(filepath)
@@ -137,6 +140,9 @@ def upload():
 
 
     # *********** FIN OCR for function creation *************
+
+
+
 
 
     
