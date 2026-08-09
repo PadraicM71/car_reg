@@ -1,200 +1,273 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Padraic's AI Reg App</title>
 
-    <style>
 
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f5f5;
-            color: #222;
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Padraic's Registration Scanner</title>
+
+<style>
+
+    body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f5f5f5;
+        color: #222;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    h1, h2, h3 {
+        text-align: center;
+        margin-top: 0;
+    }
+
+    p {
+        text-align: center;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+
+    /* ---------- Take Photo Button ---------- */
+
+    .button-container {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .button {
+        display: inline-block;
+        width: 60%;
+        padding: 14px 0;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        background: #1976d2;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .button:hover {
+        background: #c015af;
+    }
+
+    /* ---------- Metadata ---------- */
+
+    .small-button {
+        display: block;
+        margin: 15px auto;
+        padding: 8px 18px;
+        font-size: 14px;
+        border: 1px solid #999;
+        border-radius: 6px;
+        background: #efefef;
+        cursor: pointer;
+    }
+
+    .metadata {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .metadata p {
+        text-align: left;
+        margin: 4px 0;
+    }
+
+    /* ---------- Registration Buttons ---------- */
+
+    .reg-button {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        margin-top: 12px;
+
+        font-size: 20px;
+        font-weight: bold;
+
+        background: #1976d2;
+        color: #ffffff;
+
+        border: none;
+        border-radius: 10px;
+
+        cursor: pointer;
+
+        -webkit-appearance: none;
+        appearance: none;
+
+        text-align: center;
+    }
+
+    .reg-button:hover {
+        background: #c015b7;
+        color: #ffffff;
+    }
+
+    .reg-button:active {
+        background: #0d47a1;
+        color: #ffffff;
+    }
+
+    .reg-button:focus {
+        outline: none;
+        color: #ffffff;
+    }
+
+    /* ---------- Photo Processing Loading ---------- */
+
+    #loading {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.9);
+        z-index: 9999;
+    }
+
+    .loader-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        text-align: center;
+        font-family: Arial,sans-serif;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 20px;
+        border: 6px solid #ddd;
+        border-top: 6px solid #1976d2;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+
+        0% {
+            transform: rotate(0deg);
         }
 
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        100% {
+            transform: rotate(360deg);
         }
 
-        h1, h2, h3 {
-            text-align: center;
-            margin-top: 0;
+    }
+
+    /* ---------- Registration Lookup Loading ---------- */
+
+    #regLoading {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.92);
+        z-index: 9999;
+    }
+
+    .reg-loader-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 90%;
+    }
+
+    .reg-spinner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 20px;
+
+        border: 6px solid #ddd;
+        border-top: 6px solid #1976d2;
+        border-radius: 50%;
+
+        animation: regSpin 1s linear infinite;
+    }
+
+    @keyframes regSpin {
+
+        0% {
+            transform: rotate(0deg);
         }
 
-        p {
-            text-align: center;
+        100% {
+            transform: rotate(360deg);
         }
 
-        img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
+    }
 
-        /* ---------- Take Photo Button ---------- */
+    .reg-loading-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
 
-        .button-container {
-            text-align: center;
-            margin: 20px 0;
-        }
+    .reg-loading-message {
+        font-size: 15px;
+        color: #666;
+    }
 
-        .button {
-            display: inline-block;
-            width: 60%;
-            padding: 14px 0;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            background: #1976d2;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-        }
+    /* ---------- Footer ---------- */
 
-        .button:hover {
-            background: #c015af;
-        }
+    footer {
+        text-align: center;
+        font-size: 12px;
+        margin-top: 25px;
+        color: #666;
+    }
 
-        /* ---------- Metadata ---------- */
+    footer strong {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-style: italic;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
 
-        .small-button {
-            display: block;
-            margin: 15px auto;
-            padding: 8px 18px;
-            font-size: 14px;
-            border: 1px solid #999;
-            border-radius: 6px;
-            background: #efefef;
-            cursor: pointer;
-        }
+    @media (max-width: 768px) {
 
-        .metadata {
-            display: none;
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fafafa;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .metadata p {
-            text-align: left;
-            margin: 4px 0;
-        }
-
-        /* ---------- Registration Buttons ---------- */
-
-        .reg-button {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            margin-top: 12px;
-
-            font-size: 20px;
-            font-weight: bold;
-
-            background: #1976d2;
-            color: #ffffff;
-
-            border: none;
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            -webkit-appearance: none;
-            appearance: none;
-
-            text-align: center;
-        }
-
-        .reg-button:hover {
-            background: #c015b7;
-            color: #ffffff;
-        }
-
-        .reg-button:active {
-            background: #0d47a1;
-            color: #ffffff;
-        }
-
-        .reg-button:focus {
-            outline: none;
-            color: #ffffff;
-        }
-
-        footer {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 25px;
-            color: #666;
-        }
-        /* Loading overlay */
-
-        #loading{
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:rgba(255,255,255,0.9);
-            z-index:9999;
-        }
-
-        .loader-box{
-            position:absolute;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            text-align:center;
-            font-family:Arial,sans-serif;
-        }
-
-        .spinner{
-            width:50px;
-            height:50px;
-            margin:0 auto 20px;
-            border:6px solid #ddd;
-            border-top:6px solid #1976d2;
-            border-radius:50%;
-            animation:spin 1s linear infinite;
-        }
-
-        @keyframes spin{
-            0%{transform:rotate(0deg);}
-            100%{transform:rotate(360deg);}
-        }
-
-       /* Base styles for desktop screens */
         footer strong {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-style: italic;
-            font-weight: 700;
-            font-size: 1.25rem; 
+            font-size: 1.5rem;
         }
 
-        /* Responsive styles for mobile screens */
-        @media (max-width: 768px) {
-            footer strong {
-                font-size: 1.5rem; 
-            }
-        }
+    }
 
+</style>
 
-    </style>
 
 </head>
 
@@ -202,133 +275,298 @@
 
 <div class="container">
 
-    <h1>&#x1F699; Vehicle Registration Scanner</h1>
 
-    <p>
-        Capture the Irish registration plates in a photo to identify the vehicles
-    </p>
+<h1>&#x1F699; AI Vehicle Registration Scanner</h1>
 
-    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+<p>
+    Capture the Irish registration plates in a photo to identify the vehicles
+</p>
 
-        <input
-            type="file"
-            id="photo"
-            name="photo"
-            accept="image/*"
-            capture="environment"
-            style="display:none;">
 
-        <div class="button-container">
-            <label for="photo" class="button">
-                📷 Take Photo
-            </label>
-        </div>
+<!-- =========================
+     Photo Upload
+========================== -->
 
-        <input type="hidden" name="latitude" id="latitude">
-        <input type="hidden" name="longitude" id="longitude">
+<form
+    id="uploadForm"
+    action="/upload"
+    method="post"
+    enctype="multipart/form-data">
 
-    </form>
+    <input
+        type="file"
+        id="photo"
+        name="photo"
+        accept="image/*"
+        capture="environment"
+        style="display:none;">
 
-    {% if image %}
+    <div class="button-container">
 
-    <h2>Uploaded Image</h2>
-
-    <img src="/image">
-
-    <button
-        class="small-button"
-        type="button"
-        id="detailsBtn"
-        onclick="toggleDetails()">
-
-        Image Metadata
-
-    </button>
-
-    <div class="metadata" id="imageDetails">
-
-        <p><strong>Filename:</strong> {{ details.filename }}</p>
-        <p><strong>File size:</strong> {{ details.filesize }} MB</p>
-        <p><strong>Width:</strong> {{ details.width }} px</p>
-        <p><strong>Height:</strong> {{ details.height }} px</p>
-        <p><strong>Format:</strong> {{ details.format }}</p>
-        <p><strong>Mode:</strong> {{ details.mode }}</p>
-        <p><strong>Latitude:</strong> {{ details.latitude }}</p>
-        <p><strong>Longitude:</strong> {{ details.longitude }}</p>
-        <p><strong>OCR:</strong> {{ details.ocr }}</p>
+        <label for="photo" class="button">
+            📷 Take Photo
+        </label>
 
     </div>
 
-    <h2>Detected Registrations</h2>
+    <input
+        type="hidden"
+        name="latitude"
+        id="latitude">
 
-    {% if details.valid_regs %}
+    <input
+        type="hidden"
+        name="longitude"
+        id="longitude">
 
-        {% for reg in details.valid_regs %}
+</form>
 
-        <form action="/reg" method="get">
 
-            <input
-                type="hidden"
-                name="reg"
-                value="{{ reg }}">
+{% if image %}
 
-            <button class="reg-button" type="submit">
-                {{ reg }}
-            </button>
 
-        </form>
+<!-- =========================
+     Uploaded Image
+========================== -->
 
-        {% endfor %}
+<h2>Uploaded Image</h2>
 
-    {% else %}
+<img src="/image">
 
-        <p><em>No registration plates detected</em></p>
 
-    {% endif %}
+<!-- =========================
+     Image Metadata
+========================== -->
 
-    {% endif %}
+<button
+    class="small-button"
+    type="button"
+    id="detailsBtn"
+    onclick="toggleDetails()">
 
-    <footer>
-        <strong>&copy;2026 Padraic Moran</strong><br>
-        Optimised for Google Chrome
-    </footer>
+    Image Metadata
+
+</button>
+
+
+<div
+    class="metadata"
+    id="imageDetails">
+
+    <p>
+        <strong>Filename:</strong>
+        {{ details.filename }}
+    </p>
+
+    <p>
+        <strong>File size:</strong>
+        {{ details.filesize }} MB
+    </p>
+
+    <p>
+        <strong>Width:</strong>
+        {{ details.width }} px
+    </p>
+
+    <p>
+        <strong>Height:</strong>
+        {{ details.height }} px
+    </p>
+
+    <p>
+        <strong>Format:</strong>
+        {{ details.format }}
+    </p>
+
+    <p>
+        <strong>Mode:</strong>
+        {{ details.mode }}
+    </p>
+
+    <p>
+        <strong>Latitude:</strong>
+        {{ details.latitude }}
+    </p>
+
+    <p>
+        <strong>Longitude:</strong>
+        {{ details.longitude }}
+    </p>
+
+    <p>
+        <strong>OCR:</strong>
+        {{ details.ocr }}
+    </p>
+
+</div>
+
+
+<!-- =========================
+     Detected Registrations
+========================== -->
+
+<h2>Detected Registrations</h2>
+
+
+{% if details.valid_regs %}
+
+    {% for reg in details.valid_regs %}
+
+    <form
+        action="/reg"
+        method="get">
+
+        <input
+            type="hidden"
+            name="reg"
+            value="{{ reg }}">
+
+        <button
+            class="reg-button"
+            type="submit">
+
+            {{ reg }}
+
+        </button>
+
+    </form>
+
+    {% endfor %}
+
+
+{% else %}
+
+    <p>
+        <em>No registration plates detected</em>
+    </p>
+
+{% endif %}
+
+
+{% endif %}
+
+
+<!-- =========================
+     Footer
+========================== -->
+
+<footer>
+
+    <strong>&copy;2026 Padraic Moran</strong><br>
+
+    Optimised for Google Chrome
+
+</footer>
+
+
+</div>
+
+<!-- ==================================================
+     PHOTO PROCESSING LOADING SCREEN
+================================================== -->
+
+<div id="loading">
+
+```
+<div class="loader-box">
+
+    <div class="spinner"></div>
+
+    <p>
+        <strong>Please wait...</strong>
+    </p>
+
+    <p>
+        AI analysis of image
+    </p>
+
+</div>
+
+
+</div>
+
+<!-- ==================================================
+     REGISTRATION LOOKUP LOADING SCREEN
+================================================== -->
+
+<div id="regLoading">
+
+
+<div class="reg-loader-box">
+
+    <div class="reg-spinner"></div>
+
+    <div class="reg-loading-title">
+        Please wait...
+    </div>
+
+    <div class="reg-loading-message">
+        Scraping vehicle details
+    </div>
+
+</div>
+
 
 </div>
 
 <script>
 
-// Automatically upload when a photo is selected
-document.getElementById("photo").addEventListener("change", function () {
-if (this.files.length === 0)
-    return;
-// Show loading overlay
-document.getElementById("loading").style.display = "block";
-// Submit form
-document.getElementById("uploadForm").submit();
-});
+
+// ==================================================
+// Take Photo and Upload
+// ==================================================
+
+document.getElementById("photo").addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length === 0)
+            return;
+
+        // Show photo processing spinner
+        document.getElementById("loading").style.display = "block";
+
+        // Submit form
+        document.getElementById("uploadForm").submit();
+
+    }
+);
 
 
-// Show / Hide Metadata
+// ==================================================
+// Show / Hide Image Metadata
+// ==================================================
+
 function toggleDetails() {
 
-    const details = document.getElementById("imageDetails");
-    const button = document.getElementById("detailsBtn");
+    const details =
+        document.getElementById("imageDetails");
+
+    const button =
+        document.getElementById("detailsBtn");
+
 
     if (details.style.display === "block") {
 
         details.style.display = "none";
+
         button.textContent = "Image Metadata";
 
     } else {
 
         details.style.display = "block";
+
         button.textContent = "Hide Metadata";
 
     }
 
 }
 
-// Get device location
+
+// ==================================================
+// Get Device Location
+// ==================================================
+
 if (navigator.geolocation) {
 
     navigator.geolocation.getCurrentPosition(
@@ -345,7 +583,10 @@ if (navigator.geolocation) {
 
         function(error) {
 
-            console.log("Location error:", error.message);
+            console.log(
+                "Location error:",
+                error.message
+            );
 
         }
 
@@ -353,22 +594,32 @@ if (navigator.geolocation) {
 
 }
 
+
+// ==================================================
+// Registration Lookup
+// ==================================================
+
+document.querySelectorAll(
+    'form[action="/reg"]'
+).forEach(function(form) {
+
+    form.addEventListener(
+        "submit",
+        function() {
+
+            // Show registration lookup spinner
+            document.getElementById(
+                "regLoading"
+            ).style.display = "block";
+
+        }
+    );
+
+});
+
+
 </script>
 
-
-
-
-
-<div id="loading" style="display:none;">
-    <div class="loader-box">
-        <div class="spinner"></div>
-        <p>🚙 AI Analysis of Image...</p>
-        <p>Please wait...</p><br>
-        <p>Scanning registration plate data...</p>
-        
-    </div>
-</div>
-
-
 </body>
+
 </html>
