@@ -5,6 +5,10 @@ import re
 from paddleocr import PaddleOCR
 from server_reg import get_details
 
+from file_api import upload_file    # my file API
+from datetime import datetime       # used to generate unique filename below for storage
+
+
 ocr = PaddleOCR(
     lang="en",
     use_doc_orientation_classify=False,
@@ -46,6 +50,25 @@ def extract_and_strip_irish_plates(ocr_results):
 
 
 
+# used for storage to give unique filename based on date and time including milliseconds to prevent overwritting
+
+# store most recent photo (latest.jpg) on moranai server - rename with a date related timestamp
+def store_photo():
+    filename = datetime.now().strftime("%Y%m%d_%H%M%S_%f") + ".jpg"
+
+    file_for_storage = os.path.join(UPLOAD_FOLDER, "latest.jpg")
+
+    store_pic_using_file_api = upload_file(
+        file_path=file_for_storage,
+        filename=filename,
+        app="reg_app",
+        folder="pics"
+    )
+
+    print(store_pic_using_file_api)
+
+
+
 
 
 @app.route("/")
@@ -70,11 +93,14 @@ def reg():
 
 
 
-@app.route("/upload", methods=["POST"])
+@app.route("/upload", methods=["POST"]) # here upload means upload pic from user - ie: the taken photo - dont confuse with file API
 def upload():
     photo = request.files["photo"]
-    filepath = os.path.join(UPLOAD_FOLDER, "latest.jpg")
+    filepath = os.path.join(UPLOAD_FOLDER, "latest.jpg")    # this just saves another copy showing its the latest photo - it will be overwritten on next new photo
     photo.save(filepath)
+
+
+    store_photo()
 
 
     # Open image
