@@ -98,6 +98,32 @@ def store_photo_details(image_details):
 
 
 
+# store vehicle details as json - if user chooses to get vehicle info from reg
+# stored at reg_app/vehicle_details
+def store_vehicle_details(vehicle, image_details):
+    filename = image_details["filename_timestamped"].replace(".jpg", ".json")
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    try:
+
+        with open(filepath, "w", encoding="utf-8") as file:
+            json.dump(vehicle, file, indent=4)
+
+        result = upload_file(
+            file_path=filepath,
+            app="reg_app",
+            folder="vehicle_details",
+            filename=filename
+        )
+
+        return result
+
+    finally:
+
+        if os.path.exists(filepath):
+            os.remove(filepath)
+
+
 
 @app.route("/")
 def index():
@@ -107,10 +133,10 @@ def index():
 
 @app.route("/reg")
 def reg():
-
     registration = request.args.get("reg")
-
     vehicle = get_details(registration)
+    print("******* VEHICLE DETAILS REQUESTED BY USER: *******", vehicle)
+    store_vehicle_details(vehicle, image_details)
 
     return render_template(
         "reg.html",
@@ -184,10 +210,8 @@ def upload():
     image_details["valid_regs"]=irish_reg_plates
     # *********** FIN OCR ********************************************************
 
-
     # Save image details as JSON
     store_photo_details(image_details)
-
 
     # Debugging (just information to generate on runs):
     print('\nfilename timestamped:'.ljust(26) + new_filename_timestamped)
@@ -220,6 +244,7 @@ def image():
         "uploads/latest.jpg",
         mimetype="image/jpeg"
     )
+
 
 
 
