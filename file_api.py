@@ -1,6 +1,10 @@
 import os
 import requests
 
+# File API interaction functions
+# This file interacts with a custom File API, providing functionality for health checks, file uploads, 
+# downloads, listing, and deletions.
+
 # I CREATED THIS FILE TO INTERACT WITH THE API I BUILT - THIS FILE CAN BE CHANGED FOR EACH INDIVIDUAL 
 # PROJECT - KEEP ORIGIONAL SERVER API UNCHANGED
 # I PLAN TO PUT THIS FILE IN THE DIRECTORY OF EACH NEW PROJECT!
@@ -18,7 +22,7 @@ FILE_API_URL = os.environ.get(
     "https://files.moranai.net"
 )
 
-FILE_API_KEY = os.environ.get("FILE_API_KEY")                 # THIS IS FOR RENDER
+FILE_API_KEY = os.environ.get("FILE_API_KEY")
 
 
 def _get_headers():
@@ -191,3 +195,4 @@ def delete_file(app, filename, folder=""):
     response.raise_for_status()
 
     return response.json()
+
