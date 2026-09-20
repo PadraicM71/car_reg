@@ -4,6 +4,8 @@
 # code to execute it on a server here
 
 
+
+
 import requests
 
 def get_details(reg):
@@ -23,6 +25,7 @@ def get_details(reg):
 if __name__ == '__main__':
     # for testing:
     print(get_details("232d1880"))
+
 
 
 
