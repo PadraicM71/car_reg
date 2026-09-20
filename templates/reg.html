@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
-
 
 <meta charset="UTF-8">
 
@@ -80,13 +78,11 @@
 
 </style>
 
-
 </head>
 
 <body>
 
 <div class="container">
-
 
 <h1>Vehicle Details</h1>
 
@@ -110,35 +106,43 @@
 </div>
 
 <div class="detail">
-    <span class="label">Tax Class</span>
-    <span class="value">{{ vehicle['Tax Class'] }}</span>
-</div>
-
-<div class="detail">
     <span class="label">Annual Motor Tax</span>
     <span class="value">
-        {{ vehicle['Current Annual Motor Tax Rate'] }}
+        €{{ vehicle['Current Annual Motor Tax Rate'] }}
     </span>
 </div>
 
 <div class="detail">
     <span class="label">Motor Tax Expiry</span>
     <span class="value">
-        {{ vehicle['Motor Tax Expiry Date'] }}
+        {{ vehicle['Motor Tax Expiry'] }}
+    </span>
+</div>
+
+<div class="detail">
+    <span class="label">Motor Tax Status</span>
+    <span class="value">
+        {{ vehicle['Motor Tax Status'] }}
     </span>
 </div>
 
 <div class="detail">
     <span class="label">NCT Expiry</span>
     <span class="value">
-        {{ vehicle['NCT Expiry Date'] }}
+        {{ vehicle['NCT Expiry'] }}
+    </span>
+</div>
+
+<div class="detail">
+    <span class="label">NCT Status</span>
+    <span class="value">
+        {{ vehicle['NCT Status'] }}
     </span>
 </div>
 
 <a href="/" class="back-button">
     Back to ANPR
 </a>
-
 
 </div>
 
