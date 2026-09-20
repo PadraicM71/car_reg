@@ -108,7 +108,7 @@
 <div class="detail">
     <span class="label">Annual Motor Tax</span>
     <span class="value">
-        €{{ vehicle['Current Annual Motor Tax Rate'] }}
+        €{{ "%.0f"|format(vehicle['Current Annual Motor Tax Rate']) }}
     </span>
 </div>
 
